@@ -23,10 +23,12 @@ rvbench 要回答的不是「这个算子有多快」，而是「这次测量的
 
 | 仓库 | 内容 |
 |---|---|
-| [`rvbench`](https://github.com/rvbench/rvbench) | manager、CLI、运维工具、typical8 评测集 |
+| [`rvbench`](https://github.com/rvbench/rvbench) | manager、CLI、运维工具、hello-world 示例评测集 |
 | [`rvbench-core-rust`](https://github.com/rvbench/rvbench-core-rust) | `rvbench-protocol`：OpenAPI 正本、生成类型、校验、摘要、存储 |
-| `rvbench-spacemit-worker` | 板端执行服务：编译、验证、计时、能力探测 · *迁移中* |
-| `rvbench-official-suites` | 官方评测集：hello-world、nano · *迁移中* |
+| `rvbench-spacemit-worker` | 板端执行服务：编译、验证、计时、能力探测 · *构建中* |
+| `rvbench-official-suites` | 完整官方评测集 · *构建中，后续开源* |
+
+公开仓目前只内置 `hello-world` 一个最小用例，用于跑通提交、编译、执行与结果落盘；完整的算子评测集与基准数据会随 `rvbench-official-suites` 开源。
 
 ## 设计原则
 
@@ -45,7 +47,7 @@ rvbench 要回答的不是「这个算子有多快」，而是「这次测量的
 git clone https://github.com/rvbench/rvbench.git
 cd rvbench
 cargo build --workspace --locked
-cargo run -p rvbench-cli -- validate spec suites/kernels/typical8/spec.json
+cargo run -p rvbench-cli -- validate spec examples/hello-world/spec.json
 ```
 
 实现与硬件解耦：同一份请求在 K1 / K3 上都能选 `native-c` 或 `triton`，支持 `func` / `correctness` / `performance` 三类任务。方向、结构与运行手册见 [`rvbench` README](https://github.com/rvbench/rvbench#readme)。
