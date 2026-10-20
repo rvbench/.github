@@ -41,12 +41,32 @@ rvbench 要回答的不是「某段代码在板子上跑多快」，而是「这
 
 | 仓库 | 内容 |
 |---|---|
-| [`rvbench`](https://github.com/rvbench/rvbench) | manager、CLI、运维工具、hello-world 最小示例 |
-| [`rvbench-core-rust`](https://github.com/rvbench/rvbench-core-rust) | `rvbench-protocol`：OpenAPI 正本、生成类型、校验、摘要、存储 |
+| [`rvbench`](https://github.com/rvbench/rvbench) | wire 合同正本、运维工具、hello-world 最小示例 |
+| [`rvbench-cli`](https://github.com/rvbench/rvbench-cli) | 控制面客户端与离线校验库：`rvbench` / `rb-cli` |
+| [`rvbench-official-manager`](https://github.com/rvbench/rvbench-official-manager) | 控制面服务：提交、队列、准入、账本与观测汇总 |
+| [`rvbench-core-rust`](https://github.com/rvbench/rvbench-core-rust) | `rvbench-protocol`：wire 合同副本、生成类型、校验、摘要、存储 |
 | `rvbench-spacemit-worker` | 板端执行服务：编译、验证、计时、能力探测 · *构建中* |
 | `rvbench-official-suites` | 算子评测集，第一份公开测试集 · *构建中，后续开源* |
 
 公开仓目前只内置 `hello-world` 一个最小用例，用于跑通提交、编译、执行与结果落盘；完整的算子评测集与基准数据会随 `rvbench-official-suites` 开源。
+
+## rvbench-cli
+
+`rvbench-cli` 是外部接触 rvbench 的唯一入口：控制面客户端 + 离线校验库，Rust 原生、无 Python 包装。装一次得到两个命令——`rvbench` 与别名 `rb-cli`，子命令、参数与退出码完全一致。
+
+```sh
+cargo install --git https://github.com/rvbench/rvbench-cli.git --locked
+rvbench --help
+```
+
+| 能力 | 命令 | 说明 |
+|---|---|---|
+| 初始化 | `rb-cli init` | 拉 worker / manager / suite，生成配置、可提交的 `JobRequest` 与 Makefile |
+| 控制面 | `rvbench control` | `submit` / `get` / `workers` / `capabilities` / `drain`；指向 manager，或加 `--direct` 直连 worker |
+| 离线校验 | `rvbench validate` | `spec` / `hidden` / `results` / `baseline-results`；schema 编译期嵌入，不访问网络、不需要板卡 |
+| 身份摘要 | `rvbench digest` | canonical JSON 的 SHA-256，与 manager / worker 同一实现 |
+
+`validate spec --require-ready` 在仍有 readiness blocker 时返回 2：合同合法与完成板上验证是两件事。校验器、摘要与 I/O 同时以 lib（`rvbench_cli`）导出，运维工具与 CLI 共用同一套实现，不存在第二套校验口径。
 
 ## 设计原则
 
@@ -63,16 +83,29 @@ rvbench 要回答的不是「某段代码在板子上跑多快」，而是「这
 ## 快速开始
 
 ```sh
-git clone https://github.com/rvbench/rvbench.git
-cd rvbench
-cargo build --workspace --locked
-cargo run -p rvbench-cli -- validate spec examples/hello-world/spec.json
+cargo install --git https://github.com/rvbench/rvbench-cli.git --locked    # 装 rvbench 与 rb-cli
+git clone https://github.com/rvbench/rvbench.git && cd rvbench
+
+rvbench validate spec examples/hello-world/spec.json   # 离线校验，无需板卡与网络
+rvbench digest   examples/hello-world/spec.json        # 工作负载身份摘要
+
+rb-cli init demo        # 生成 worker + manager + suite 的独立运行环境
 ```
 
+`rb-cli init` 产出的目录自带 Makefile：`make build` → `make manager` / `make worker` → `make validate` → `make submit`，一条 `hello-world` 作业从提交跑到结果落盘。worker 仓暂未公开，公开环境下用 `rb-cli init demo --manager --suite` 只取控制面与用例。
+
 `func` / `correctness` / `performance` 三类任务共用同一套合同，同一份 spec 在三块板上语义一致。方向、结构与运行手册见 [`rvbench` README](https://github.com/rvbench/rvbench#readme)。
+
+## 更多资源
+
+| 目标 | 入口 | 状态 |
+|---|---|---|
+| 提交第一个算子 | [spec.json v2 格式与首份实例](https://github.com/rvbench/rvbench/blob/main/docs/specs/2026-10-08-spec-json%E6%A0%BC%E5%BC%8F.md) — 算子声明、用例、输入生成与数值合同 | 可用 |
+| 构建第一个 worker | [`examples/hello-world/worker`](https://github.com/rvbench/rvbench/tree/main/examples/hello-world/worker) — 板端执行服务的最小实现骨架 | 准备中 |
+| 构建第一个 suite | [`examples/hello-world/suite`](https://github.com/rvbench/rvbench/tree/main/examples/hello-world/suite) — 从 spec 到可提交评测集的完整目录 | 准备中 |
 
 ## 参与
 
 - 缺陷与提案：在对应仓库开 Issue
-- 合同变更：先改 `rvbench-core-rust` 的 OpenAPI，再生成类型与 conformance 测试，最后落到实现
+- 合同变更：先改 `rvbench` 的 `contracts/api/openapi.json`，同步协议仓与 CLI 副本，再生成类型与 conformance 测试，最后落到实现
 - 新场景接入：新增工作负载定义与参照，复用既有观测结构，不另起一套测量口径
