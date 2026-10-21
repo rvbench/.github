@@ -7,7 +7,7 @@
 
 <h3 align="center">潮水涨落，刻度不动</h3>
 
-<p align="center">RISC-V 软硬协同评测基础设施 · 合同定义实验 · 每个结果可复现 · 每条证据可核对</p>
+<p align="center">RISC-V 软硬协同评测基础设施 · 每个实验可定制 · 每个结果可复现 · 每条证据可核对</p>
 
 ---
 
@@ -30,6 +30,22 @@ rvbench 要回答的是：准确、可复现的软硬协同测试结果。可复
 > - **应用 / 软件 suite**：你每天真正在跑的负载，比合成用例更贴近现场。整理成评测集，交给同一套合同来判。
 >
 > 想参与，就在本仓或 [rvbench](https://github.com/rvbench/rvbench) 开个 Issue，说说平台和 SDK 版本；有一份能跑起来的最小负载就够开始。
+
+## 快速开始
+
+```sh
+cargo install --git https://github.com/rvbench/rvbench-cli.git --locked    # 装 rvbench 与 rb-cli
+git clone https://github.com/rvbench/rvbench.git && cd rvbench
+
+rvbench validate spec examples/hello-world/spec.json   # 离线校验，无需板卡与网络
+rvbench digest   examples/hello-world/spec.json        # 工作负载身份摘要
+
+rb-cli init demo        # 生成 worker + manager + suite 的独立运行环境
+```
+
+`rb-cli init` 产出的目录自带 Makefile：`make build` → `make manager` / `make worker` → `make validate` → `make submit`，一条 `hello-world` 作业从提交跑到结果落盘。worker 仓暂未公开，公开环境下用 `rb-cli init demo --manager --suite` 只取控制面与用例。
+
+`func` / `correctness` / `performance` 三类任务共用同一套合同，同一份 spec 在三块板上语义一致。方向、结构与运行手册见 [`rvbench` README](https://github.com/rvbench/rvbench#readme)。
 
 ## 首批上线设施
 
@@ -79,22 +95,6 @@ rvbench --help
 | **证据随结果走** | 原始样本、warmup、重复次数、工件 SHA-256、worker 与板卡身份一并落盘 |
 
 任务 `done` 是服务终态，不等于科学评测通过。合同校验通过、哈希一致、作业状态 `done`，任何一项单独都不能当作完整验证。
-
-## 快速开始
-
-```sh
-cargo install --git https://github.com/rvbench/rvbench-cli.git --locked    # 装 rvbench 与 rb-cli
-git clone https://github.com/rvbench/rvbench.git && cd rvbench
-
-rvbench validate spec examples/hello-world/spec.json   # 离线校验，无需板卡与网络
-rvbench digest   examples/hello-world/spec.json        # 工作负载身份摘要
-
-rb-cli init demo        # 生成 worker + manager + suite 的独立运行环境
-```
-
-`rb-cli init` 产出的目录自带 Makefile：`make build` → `make manager` / `make worker` → `make validate` → `make submit`，一条 `hello-world` 作业从提交跑到结果落盘。worker 仓暂未公开，公开环境下用 `rb-cli init demo --manager --suite` 只取控制面与用例。
-
-`func` / `correctness` / `performance` 三类任务共用同一套合同，同一份 spec 在三块板上语义一致。方向、结构与运行手册见 [`rvbench` README](https://github.com/rvbench/rvbench#readme)。
 
 ## 更多资源
 
