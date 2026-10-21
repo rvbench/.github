@@ -7,7 +7,7 @@
 
 <h3 align="center">RISC-V 软硬协同评测基础设施</h3>
 
-<p align="center">合同定义实验 · worker 在真实板卡上执行 · 结果自带可复核的证据</p>
+<p align="center">合同定义实验 · 每个结果可复现 · 每条证据可核对</p>
 
 ---
 
