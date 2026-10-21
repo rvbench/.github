@@ -60,7 +60,7 @@ rb-cli init demo        # 生成 worker + manager + suite 的独立运行环境
 | `rvbench-ruyi-worker` | 如意（Ruyi）板端执行服务 · *构建中* |
 | `rvbench-xuantie-worker` | 玄铁（XuanTie）板端执行服务 · *筹备中* |
 | `rvbench-official-suites` | 算子评测集，第一份公开测试集 · *测试中，即将开源* |
-| `rvbench-security-suite` | 安全评测集：常量时间与侧信道暴露的判定用例 · *构建中* |
+| `rvbench-security-suite` | 安全评测集 · *构建中* |
 
 worker 按后端拆仓，各自独立部署，共用同一套合同与执行语义；接入新板卡只新增一个 worker 仓，不动控制面与 CLI。
 
