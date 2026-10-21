@@ -46,7 +46,13 @@ rvbench 要回答的不是「某段代码在板子上跑多快」，而是「这
 | [`rvbench-official-manager`](https://github.com/rvbench/rvbench-official-manager) | 控制面服务：提交、队列、准入、账本与观测汇总 |
 | [`rvbench-core-rust`](https://github.com/rvbench/rvbench-core-rust) | `rvbench-protocol`：wire 合同副本、生成类型、校验、摘要、存储 |
 | `rvbench-spacemit-worker` | 板端执行服务：编译、验证、计时、能力探测 · *构建中* |
+| `rvbench-xiangshan-worker` | 香山（XiangShan）板端执行服务 · *构建中* |
+| `rvbench-ruyi-worker` | 如意（Ruyi）板端执行服务 · *构建中* |
+| `rvbench-xuantie-worker` | 玄铁（XuanTie）板端执行服务 · *筹备中* |
 | `rvbench-official-suites` | 算子评测集，第一份公开测试集 · *构建中，后续开源* |
+| `rvbench-security-suite` | 安全评测集：常量时间与侧信道暴露的判定用例 · *构建中* |
+
+worker 按后端拆仓，各自独立部署，共用同一套合同与执行语义；接入新板卡只新增一个 worker 仓，不动控制面与 CLI。
 
 公开仓目前只内置 `hello-world` 一个最小用例，用于跑通提交、编译、执行与结果落盘；完整的算子评测集与基准数据会随 `rvbench-official-suites` 开源。
 
