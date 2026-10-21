@@ -7,7 +7,7 @@
   </picture>
 </p>
 
-<h3 align="center">Tides rise and fall. The marks hold.</h3>
+<h3 align="center">Tides change. The gauge doesn't.</h3>
 
 <p align="center">RISC-V software–hardware co-evaluation infrastructure · every experiment configurable · every result reproducible · every piece of evidence checkable</p>
 
